@@ -1,0 +1,241 @@
+    def verifyRoute(t1,t2):
+        if t1.going:
+            if t2.going:
+                dx=(t1.x-t2.x)
+                dy=(t1.y-t2.y)
+                if t1.face==0:
+                    if t2.face==1:
+                        return Collision.verifyRoute(t1,t2,dy,dx)
+                    elif t2.face==3:
+                        return Collision.verifyRoute(t1,t2,dy,-dx)
+                elif t1.face==1:
+                    if t2.face==0:
+                        return Collision.verifyRoute(t1,t2,-dx,-dy)
+                    elif t2.face==2:
+                        return Collision.verifyRoute(t1,t2,-dx,dy)
+                elif t1.face==2:
+                    if t2.face==1:
+                        return Collision.verifyRoute(t1,t2,-dy,dx)
+                    elif t2.face==3:
+                        return Collision.verifyRoute(t1,t2,-dy,-dx)
+                elif t1.face==3:
+                    if t2.face==0:
+                        return Collision.verifyRoute(t1,t2,dx,-dy)
+                    elif t2.face==2:
+                        return Collision.verifyRoute(t1,t2,dx,dy)
+            else:
+                if t1.face==0:
+                    if t1.x>t2.x-t_wh and t1.x<t2.x+t_wh and t1.y-t2.y>0:
+                        return [Collision(t1.y-t2.y,t1)]
+                elif t1.face==1:
+                    if t1.y>t2.y-t_wh and t1.y<t2.y+t_wh and t1.x-t2.x>0:
+                        return [Collision(t1.x-t2.x,t1)]
+                elif t1.face==2:
+                    if t1.x>t2.x-t_wh and t1.x<t2.x+t_wh and t2.y-t1.y>0:
+                        return [Collision(t2.y-t1.y,t1)]
+                elif t1.face==3:
+                    if t1.y>t2.y-t_wh and t1.y<t2.y+t_wh and t2.x-t1.x>0:
+                        return [Collision(t2.x-t1.x,t1)]
+        return []
+    def verifyRoute(t1,t2,td1,td2):
+        d=td1-td2
+        n=d/t_wh
+        if n>-1 and n<0:
+            return [Collision(td2,t2,t1,d)]
+        elif n==0:
+            return [Collision(td2,t2,t1,d),Collision(td1,t1,t2,d)]
+        elif n>0 and n<1:
+            return [Collision(td1,t1,t2,d)]
+        return []
+
+
+
+            temp = []
+        if self.going:
+            for t in Tank.All:
+                if t.going:
+                    dx=t.x-self.x
+                    dy=t.y-self.y
+                    d=dx-dy
+                    if Collision.check(self,t):
+                        collisions=t.verifyRoute()
+                        for collision in collisions:
+                            if collision.l==0:
+                                if self.face==0:
+                                    if t.face==0 or t.face==2:
+                                        temp.append(Collision(self,y=dy+collision.y+t_wh_h))
+                                    elif t.face==1 or t.face==3:
+                                        if t.x+collision.x-t_wh_h<self.x and t.x+collision.x+t_wh_h>self.x:
+                                            temp.append(Collision(self,y=dy+t_wh_h))
+                                if self.face==2:
+                                    if t.face==0 or t.face==2:
+                                        temp.append(Collision(self,y=dy+collision.y-t_wh_h))
+                                    elif t.face==1 or t.face==3:
+                                        if t.x+collision.x-t_wh_h<self.x and t.x+collision.x+t_wh_h>self.x:
+                                            temp.append(Collision(self,y=dy-t_wh_h))
+                                if self.face==1:
+                                    if t.face==1 or t.face==3:
+                                        temp.append(Collision(self,y=dx+collision.x-t_wh_h))
+                                    elif t.face==0 or t.face==2:
+                                        if t.y+collision.y-t_wh_h<self.y and t.y+collision.y+t_wh_h>self.y:
+                                            temp.append(Collision(self,x=dx-t_wh_h))
+                                if self.face==3:
+                                    if t.face==1 or t.face==3:
+                                        temp.append(Collision(self,y=dx+collision.x+t_wh_h))
+                                    elif t.face==0 or t.face==2:
+                                        if t.y+collision.y-t_wh_h<self.y and t.y+collision.y+t_wh_h>self.y:
+                                            temp.append(Collision(self,x=dx+t_wh_h))
+                            else:
+                                if self.face==0:
+                                    if t.face==0:
+                                        if 
+                                        temp.append(Collision(self,y=))
+
+
+
+                else:
+                    if self.face==0:
+                        if self.x>t.x-t_wh and self.x<t.x+t_wh and self.y>t.y-t_wh:
+                            temp = [Collision(self,y=self.y-t.y+t_wh_h)]
+                    elif self.face==1:
+                        if self.y>t.y-t_wh and self.y<t.y+t_wh and self.x>t.x-t_wh:
+                            temp = [Collision(self,x=self.x-t.x-t_wh_h)]
+                    elif self.face==2:
+                        if self.x>t.x-t_wh and self.x<t.x+t_wh and t.y>self.y-t_wh:
+                            temp = [Collision(self,y=self.y-t.y-t_wh_h)]
+                    elif self.face==3:
+                        if self.y>t.y-t_wh and self.y<t.y+t_wh and t.x>self.x-t_wh:
+                            temp = [Collision(self,x=self.x-t.x+t_wh_h)]
+            if self.face==0:
+                temp.append(Collision(self,y=-self.y))
+            elif self.face==1:
+                temp.append(Collision(self,x=display[0]-self.x))
+            elif self.face==2:
+                temp.append(Collision(self,y=display[1]-self.y))
+            elif self.face==1:
+                temp.append(Collision(self,x=-self.x))
+        return []
+
+    def collides(t1,t2):
+        t1.face==0 and 
+            ((t2.face==1 and t1.y>t2.y+t_wh and t1.x<t2.x-t_wh) or 
+            (t2.face==3 and t1.y>t2.y+t_wh and t1.x>t2.x+t_wh) or 
+            (t2.face==2 and t1.x>t2.x-t_wh and t1.x<t2.x+t_wh and t1.y>t2.y-t_wh)) or
+        t1.face==1 and
+            ((t2.face==0 and t1.y<t2.y-t_wh and t1.x<t2.x-t_wh) or 
+            (t2.face==2 and t1.y>t2.y+t_wh and t1.x<t2.x-t_wh) or 
+            (t2.face==3 and t1.y>t2.y-t_wh and t1.y<t2.y+t_wh and t1.x<t2.x-t_wh)) or
+        t1.face==2 and 
+            ((t2.face==1 and t1.y<t2.y-t_wh and t1.x>t2.x-+t_wh) or 
+            (t2.face==3 and t1.y<t2.y-t_wh and t1.x<t2.x-t_wh) or 
+            (t2.face==0 and t1.x>t2.x-t_wh and t1.x<t2.x+t_wh and t1.y<t2.y-t_wh)) or
+        t1.face==3 and
+            ((t2.face==0 and t1.y<t2.y-t_wh and t1.x>t2.x+t_wh) or 
+            (t2.face==2 and t1.y>t2.y+t_wh and t1.x<t2.x-t_wh) or 
+            (t2.face==1 and t1.y>t2.y-t_wh and t1.y<t2.y+t_wh and t1.x>t2.x-t_wh))
+class Collision:
+    def __init__(self,t1,t2=None,l=0,x=0,y=0):
+        self.tank1 = t1
+        self.tank2 = t1
+        self.x = x
+        self.y = y
+        self.l = l
+
+
+    def getNC(self,wo=None):
+        """ the Nearest Collision """
+        temp = []
+        if self.going:
+            for t in Tank.All:
+                if t!=self and t!=wo:
+                    if t.going:
+                        if self.collides(t):
+                            t.do(self)
+                            dx = self.x - t.x
+                            dy = self.y - t.y
+                            if self.face==0 and self.y-t.y>t_wh:
+                                if t.face==1:
+                                    temp=Tank.auxFunc(temp,dy,dx)
+                                elif t.face==3:
+                                    temp=Tank.auxFunc(temp,dy,-dx)
+                                elif t.face==2:
+                                    temp.append([dy/2,0])
+                            elif self.face==1 and self.x-t.x>t_wh:
+                                if t.face==0:
+                                    temp=Tank.auxFunc(temp,-dx,-dy)
+                                elif t.face==2:
+                                    temp=Tank.auxFunc(temp,-dx,dy)
+                                elif t.face==3:
+                                    temp.append([-dx/2,0])
+                            elif self.face==2 and t.y-self.y>t_wh:
+                                if t.face==1:
+                                    temp=Tank.auxFunc(temp,-dy,dx)
+                                elif t.face==3:
+                                    temp=Tank.auxFunc(temp,-dy,-dx)
+                                elif t.face==0:
+                                    temp.append([-dy/2,0])
+                            elif self.face==3 and t.x-self.x>t_wh:
+                                if t.face==0:
+                                    temp=Tank.auxFunc(temp,dx,-dy)
+                                elif t.face==2:
+                                    temp=Tank.auxFunc(temp,dx,dy)
+                                elif t.face==1:
+                                    temp.append([dx/2,0])
+                    else:
+                        if self.face==0:
+                            if self.x>t.x-t_wh and self.x<t.x+t_wh and self.y>t.y+t_wh-1: temp.append([self.y-t.y-t_wh_h-1,0])
+                        elif self.face==1:
+                            if self.x<t.x-t_wh+1 and self.y<t.y+t_wh and self.y>t.y-t_wh: temp.append([t.x-self.x-t_wh_h-1,0])
+                        elif self.face==2:
+                            if self.x>t.x-t_wh and self.x<t.x+t_wh and self.y<t.y-t_wh+1: temp.append([t.y-self.y-t_wh_h-1,0])
+                        elif self.face==3:
+                            if self.x>t.x+t_wh-1 and self.y<t.y+t_wh and self.y>t.y-t_wh: temp.append([self.x-t.x-t_wh_h-1,0])
+
+        if self.face==0 and self.y>0:
+            temp.append([self.y,0])
+        elif self.face==1 and display[0]-self.x>0:
+            temp.append([display[0]-self.x,0])
+        elif self.face==2 and display[1]-self.y>0:
+            temp.append([display[1]-self.y,0])
+        elif self.face==3 and self.x>0:
+            temp.append([self.x,0])
+        #print(temp)
+        m=None
+        temp1=None
+        for t in temp:
+            if m==None or m>t[0]:
+                m=t[0]
+                temp1=t
+
+        return temp1
+
+    def auxFunc(temp,td1,td2):
+        d=td1-td2
+        if d>0 and d<t_wh:
+            temp.append([td1,d])
+        return temp
+
+    def do(self,wo=None):
+        if self.going:
+            s=math.floor((time.time()-self.btime)*t_sp-self.s)
+            self.s += s
+            temp=self.getNC(wo)
+            while temp:
+                temp1=temp[0]-t_wh_h
+                if temp1<s:
+                    if temp[1]==0:
+                        s=temp1
+                    else:
+                        s-=temp[1]
+                        if s<temp[0]: s=temp[0]
+                else: break
+                temp=self.getNC(wo)
+            #print([self.x,self.y,s])
+            if self.face==0:
+                self.y-=s
+            elif self.face==1:
+                self.x+=s
+            elif self.face==2:
+                self.y+=s
+            elif self.face==3:
+                self.x-=s

@@ -1,0 +1,3 @@
+Nurni boshlang'ich nuqtasi A bo'lsa, ikkita nur kesishish nuqtasini B deymiz, AB vektorni yo'nalishini radianda topib nurniki bilan solishtirasiz, teng chiqsa demak nuqta nurga tegishli
+
+Agar A va B nuqtalar ustma ust tushib qolsa yo'nalish topolmay qolasiz, u holda nuqta nurga tegishli deb olib ketasiz

@@ -1,174 +1,109 @@
 import time,math,random
 
-
 t_wh = 35 # tank width/height
 t_wh_h = 17 # tank width/height half
-t_sp = 40 # tank speed
-sh_sp = 40 # shoot speed
+t_sp = 40 # tank speed px/s
+sh_sp = 40 # shoot speed px/s
 display = 512, 256 # display x,y
+
 class Botank:
-    tanks = [];
-    shots = [];
-    collisions = [];
-    def __init__(self):
-        pass
-    
-    def newTank(self,i):
-        available = False
-        while available==False:
-            available = True
-            x=random.randrange(t_wh, display[0]-t_wh)
-            y=random.randrange(t_wh, display[1]-t_wh)
-            for tank in self.tanks:
-                coords=tank.getCoords()
-                if coords[0]-t_wh>x and x<coords[0]+t_wh and coords[1]-t_wh>y and y<coords[1]+t_wh:
-                    available = False
-                    break
+	
+	def newTank(i):
+		available = False
+		while available==False:
+			x=random.randrange(t_wh, display[0]-t_wh)
+			y=random.randrange(t_wh, display[1]-t_wh)
+			Botank.render()
+			available = Botank.isAvailable(x,y)
 
-        self.tanks.append(Tank(i,x,y,0))
+		return Tank(i,x,y,0)
 
-    def getTank(self, i):
-        for tank in self.tanks:
-            if tank.id==i: return tank
-        return False
-    def newCommand(self, i, command, arg=None):
-        tank=self.getTank(i)
-        if tank:
-            if command==0:
-                tank.stop()
-            elif command==1:
-                tank.go()
-            elif command==2:
-                tank.turn(arg)
-        return False
-            
-    def state():
-        pass
+	def isAvailable(x,y):
+		available = True
+		for tank in Tank.All:
+			if tank.pos.x-t_wh>x and x<tank.pos.x+t_wh and tank.pos.y-t_wh>y and y<tank.pos.y+t_wh:
+				available = False
+				break
+		return available
+
+	def getTank(i): # trouble
+		for tank in Tank.All:
+			if tank.id==i: return tank
+		return False
+
+	def newCommand(i, command, arg=None):
+		tank=self.getTank(i)
+		if tank:
+			tank.newCommand(command,arg)
+		return False
+
+	def render():
+		ttime=time.time()
+		for t in Tank.All:
+			Botank.renderTank(t,ttime)
+
+	def renderTank(t,ttime):
+		colls=t.findCollisions()
+		if not colls:
+			t.sdo(t.do(ttime))
+
 
 class Tank:
-    """docstring for tank"""
-    All = []
-    def __init__(self, i, x, y, face):
-        self.id = i
-        self.x = x
-        self.y = y
-        self.face = face
-        self.time = time.time()
-        self.going = False
-        Tank.All.append(self)
-        #self.collisions = []
+	"""docstring for tank"""
+	All = []
+	def __init__(self, i, x, y, face):
+		self.id = i
+		self.pos = Point(x,y)
+		self.face = Ray(self.pos, angle=face)
+		self.btime = time.time() # time of last render
+		self.going = False
+		self.s = 0 # the displacement of last render
+		Tank.All.append(self)
 
-    def do(self):
-        ttime = time.time()
-        dt = ttime-self.time
-        if self.going:
-            s=dt*t_sp
-            temp=self.getNC()
-            if temp and temp[0]<s:
-            	s-=temp[1]
-            	if s<temp[0]: s=temp[0]
-            if self.face==0:
-                self.y-=s
-            elif self.face==1:
-                self.x+=s
-            elif self.face==2:
-                self.y+=s
-            elif self.face==3:
-                self.x-=s
-        self.time = ttime
+	def findCollisions(self):
+		for t in Tank.All:
+			if t!=self:
+				temp = intersection(self,t)
+				if temp: yield temp
 
-    def newCommand(self, command, agr=None):
+	def do(self,ttime): # gives how much to move
+		if self.going:
+			return math.floor((ttime-self.btime)*t_sp-self.s)
+		else:
+			return 0
 
-        if command==0:
-        	self.going=False
-        elif command==1: 
-        	self.going=True
-        elif command==2:
-        	self.face=face
+	def sdo(self,s): #moves tank
+		if self.going:
+			self.pos.translate(sin(self.face.angle)*s,cos(self.face.angle)*s)
 
-    def getCoords(self):
-        self.do()
-        return (self.x, self.y)
 
-    def getNC(self):
-    	""" the Nearest Collision """
-    	temp = []
-    	if self.going:
-	    	for t in Tank.All:
-	    		if t.going:
-	    			t.do()
-	    			dx = self.x - t.x
-	    			dy = self.y - t.y
-	    			if self.face==0 and self.y-t.y>t_wh:
-	    				if t.face==1:
-	    					temp=Tank.auxFunc(temp,dy,dx)
-	    				elif t.face==3:
-	    					temp=Tank.auxFunc(temp,dy,-dx)
-	    				elif t.face==2:
-	    					temp.append([dy/2,0])
-	    			elif self.face==1 and self.x-t.x>t_wh:
-	    				if t.face==0:
-	    					temp=Tank.auxFunc(temp,-dx,-dy)
-	    				elif t.face==2:
-	    					temp=Tank.auxFunc(temp,-dx,dy)
-	    				elif t.face==3:
-	    					temp.append([-dx/2,0])
-	    			elif self.face==2 and t.y-self.y>t_wh:
-	    				if t.face==1:
-	    					temp=Tank.auxFunc(temp,-dy,dx)
-	    				elif t.face==3:
-	    					temp=Tank.auxFunc(temp,-dy,-dx)
-	    				elif t.face==0:
-	    					temp.append([-dy/2,0])
-	    			elif self.face==3 and t.x-self.x>t_wh:
-	    				if t.face==0:
-	    					temp=Tank.auxFunc(temp,dx,-dy)
-	    				elif t.face==2:
-	    					temp=Tank.auxFunc(temp,dx,dy)
-	    				elif t.face==1:
-	    					temp.append([dx/2,0])
-	    		else:
-	    			if self.face==0:
-	    				if self.x>t.x-t_wh and self.x<t.x+t_wh and self.y-t.y>t_wh: temp.append([self.y-t.y,0])
-	    			elif self.face==1:
-	    				if self.y>t.y-t_wh and self.y<t.y+t_wh and self.x-t.x>t_wh: temp.append([self.x-t.x,0])
-	    			elif self.face==2:
-	    				if self.x>t.x-t_wh and self.x<t.x+t_wh and t.y-self.y>t_wh: temp.append([t.y-self.y,0])
-	    			elif self.face==3:
-	    				if self.y>t.y-t_wh and self.y<t.y+t_wh and t.x-self.x>t_wh: temp.append([t.x-self.x,0])
+	def newCommand(self, command, arg=None):
+		ttime=time.time()
+		Botank.renderTank(self,ttime)
+		self.s = 0
+		self.btime = ttime
+		if command==0:
+			self.going=False
+		elif command==1: 
+			self.going=True
+		elif command==2:
+			if arg == 0:
+				self.face.rotate(pi)
+				print("hi")
+			elif arg == 1:
+				self.face.rotate(pi)
 
-		if self.face==0:
-		    temp.append([self.y,0])
-		elif self.face==1:
-		    temp.append([display[0]-self.x,0])
-		elif self.face==2:
-		    temp.append([display[1]-self.y,0])
-		elif self.face==1:
-		    temp.append([self.x,0])
+	def getCoords(self):
+		ttime=time.time()
+		Botank.renderTank(self,ttime)
+		return (self.pos.x-t_wh_h, self.pos.x-t_wh_h)
 
-	    for t in temp:
-			if m==None or m>t[0]:
-				m=t[0]
-				temp1=t
-
-	    return temp1
-
-    def auxFunc(temp,td1,td2):
-        d=td1-td2
-        if d>0 and d<t_wh:
-            temp.append([td1,d])
-        return temp
-
-class Shoot:
-    def __init__(self, x, y, face):
-        self.x = x
-        self.y = y
-        self.face = face
-
-class Collision:
-    def __init__(self,t1,t2=None,l=0,x=0,y=0):
-        self.tank1 = t1
-        self.tank2 = t1
-        self.x = x
-        self.y = y
-        self.l = l
+	# def N2G(N):
+	# 	if N==0:
+	# 		return 90
+	# 	elif N==1
+	# 		return 0
+	# 	elif N==2
+	# 		return 270
+	# 	elif N==3
+	# 		return 180

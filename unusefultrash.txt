@@ -1,0 +1,85 @@
+class Ray:
+	def __init__(self,p,d):
+		self.p = p #point
+		self.d = d #radian
+
+	def getLine(self):
+		a = math.cos(self.d)
+		b = -math.sin(self.d)
+		c = -(b*self.p.x+a*self.p.y)
+		return Line(a, b, c)
+
+	def checkPoint(self,x):
+		l=self.getLine()
+		#l=Line(self.p, self.d)
+		d = math.atan2(l.getPoint(x), x)
+		#d = math.atan2(p.x, p.y)
+		print(d,self.d)
+		if math.isclose(d,self.d,rel_tol=0.1):
+			return True
+		else:
+			return False
+
+	def collides(r1,r2):
+		l1=r1.getLine()
+		l2=r2.getLine()
+		p=Line.collides(l1,l2)
+		if not p: return False
+		if not r1.checkPoint(p): return False
+		if not r2.checkPoint(p): return False
+		return True
+
+
+class Line:
+	# ax+by+c=0
+	def __init__(self, a, b, c):
+		self.a = a
+		self.b = b
+		self.c = c
+
+	def getPoint(self,x):
+		return (-self.b*x-self.c)/self.a
+
+	def collides(l1,l2):
+		if l1.a*l2.b==l2.a*l1.b: return None
+		x=(l1.a*l2.c-l2.a*l1.c)/(l2.a*l1.b-l1.a*l2.b)
+		y=l1.getPoint(x)
+		return Point(x,y)
+
+# class Pline:
+# 	def __init__(self,p, d):
+# 		self.p = p
+# 		self.d = d
+
+# 	def getPoint(self,x):
+# 		return (math.sin(self.d)*x+(-math.sin(self.d)*self.p.x+math.cos(self.d)*self.p.y))/math.cos(self.d)
+		
+
+class Point:
+	def __init__(self, x,y):
+		self.x = x
+		self.y = y
+
+class Vector:
+	def __init__(self,p1,p2):
+		self.p1=p1
+		self.p2=p2
+
+
+
+		if t1.face==0:
+			if t2.face==1 and t1.y>t2.y+t_wh and t1.x>t2.x-t_wh: return ((t2.x-t1.x)-(t1.y-t2.y))
+			elif t2.face==3 and t1.y>t2.y+t_wh and t1.x<t2.x+t_wh: return ((t1.x-t2.x)-(t1.y-t2.y))
+			elif t2.face==2 and t1.x>t2.x-t_wh and t1.x<t2.x+t_wh and t1.y>t2.y+t_wh: return (t1.y-t2.y)/2
+		elif t1.face==1:
+			if t2.face==0 and t1.y<t2.y+t_wh and t1.x<t2.x-t_wh: return ((t2.y-t1.y)-(t2.x-t1.x))
+			elif t2.face==2 and t1.y>t2.y-t_wh and t1.x<t2.x-t_wh: return ((t1.y-t2.y)-(t2.x-t1.x))
+			elif t2.face==3 and t1.y>t2.y-t_wh and t1.y<t2.y+t_wh and t1.x<t2.x-t_wh: return (t2.x-t1.x)/2
+		elif t1.face==2:
+			if t2.face==1 and t1.y<t2.y-t_wh and t1.x>t2.x-t_wh: return ((t1.x-t2.x)-(t2.y-t1.y))
+			elif t2.face==3 and t1.y<t2.y-t_wh and t1.x<t2.x+t_wh: return ((t2.x-t1.x)-(t2.y-t1.y))
+			elif t2.face==0 and t1.x>t2.x-t_wh and t1.x<t2.x+t_wh and t1.y<t2.y-t_wh: return (t2.y-t1.y)/2
+		elif t1.face==3:
+			if t2.face==0 and t1.y<t2.y+t_wh and t1.x>t2.x+t_wh: return ((t2.y-t1.y)-(t1.x-t2.x))
+			elif t2.face==2 and t1.y>t2.y-t_wh and t1.x>t2.x+t_wh: return ((t2.y-t1.y)-(t1.x-t2.x))
+			elif t2.face==1 and t1.y>t2.y-t_wh and t1.y<t2.y+t_wh and t1.x>t2.x+t_wh: return (t1.x-t2.x)/2
